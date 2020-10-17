@@ -70,3 +70,14 @@ def login():
 def addEvent():
     if request.method == 'POST':
        name, expectedTime, startDateTime, repeat, numTimesMissed = request.form
+
+@app.route('/event/get', methods=['POST'])
+def getEvents():
+     if request.method == 'POST':
+         username, checkPassword = request.form['username'],request.form['password']
+         cursor.execute("SELECT * FROM users WHERE username='{0}'".format(username))
+         for password in cursor:
+             if (password == password):
+                 cursor.execute("SELECT * FROM events{0}".format(username))
+                 for name, expectedTime, startDateTime, repeat, numTimesMissed in cursor:
+                     print(name, expectedTime, startDateTime, repeat, numTimesMissed)
