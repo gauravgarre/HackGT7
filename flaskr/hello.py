@@ -30,7 +30,7 @@ def create():
         birthDate = request.form['birthDate']
         #regex_email = '[^@]+@[^@]+\.[^@]+'
         regex_bday = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
-        if 20 < len(firstName) < 0 and 20 < len(lastName) < 0 and 20 < len(username) < 0 and 20 < len(password) < 6:
+        if not (20 > len(firstName) > 0 and 20 > len(lastName) > 0 and 20 > len(username) > 0 and 20 > len(password) > 6):
             return "Record not found", 400
         if not re.search(regex_bday, birthDate):
             return "Record not found", 400
