@@ -3,13 +3,13 @@ from flask import request
 import mysql.connector
 import mysql
 import uuid
+import re
 
 cnx = mysql.connector.connect(user='root', password='dreamTeam135',
                               host='104.198.46.183',
                               database='users')
 cnx.database = 'users'
 cursor = cnx.cursor()
-#import re
 
 app = Flask(__name__)
 
@@ -28,11 +28,11 @@ def create():
         password = request.form['password']
         email = request.form['email']
         birthDate = request.form['birthDate']
-        max = 50
         #regex_email = '[^@]+@[^@]+\.[^@]+'
-
-        if len(firstName) > max and len(lastName) > max and len(username) > max and len(password) > max and len(
-                birthDate) > max:
+        regex_bday = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+        if 20 < len(firstName) < 0 and 20 < len(lastName) < 0 and 20 < len(username) < 0 and 20 < len(password) < 6:
+            return "Record not found", 400
+        if not re.search(regex_bday, birthDate):
             return "Record not found", 400
         # if not re.search(regex_email, email):
         #    return "Record not found email", 400
@@ -54,4 +54,14 @@ def delete():
         username, password = request.form['username'],request.form['password']
         cursor.execute("DELETE FROM users WHERE username = '{0}' AND password = '{1}'".format(username, password))
         cnx.commit()
+        return "Success", 200
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        username, password = request.form['username'], request.form['password']
+        if 20 < len(username) < 0 and 20 < len(password) < 6:
+            return "Record not found", 400
+        #cursor.execute("")
+        #cnx.commit()
         return "Success", 200
