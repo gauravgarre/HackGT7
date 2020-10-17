@@ -4,6 +4,7 @@ import mysql.connector
 import mysql
 import uuid
 import re
+import json
 
 cnx = mysql.connector.connect(user='root', password='dreamTeam135',
                               host='104.198.46.183',
@@ -32,9 +33,9 @@ def create():
         regex_bday = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
         if not (20 > len(firstName) > 0 and 20 > len(lastName) > 0 and 20 > len(username) > 0 and 20 > len(
                 password) > 6):
-            return "Record not found", 400
+            return "Email/password invalid length", 400
         if not re.search(regex_bday, birthDate):
-            return "Record not found", 400
+            return "birthDate invalid format", 400
         # if not re.search(regex_email, email):
         #    return "Record not found email", 400
 
@@ -67,28 +68,36 @@ def delete():
 def login():
     if request.method == 'POST':
         username, password = request.form['username'], request.form['password']
+
         if 20 < len(username) < 6 and 20 < len(password) < 6:
-            return "Username and/or password invalid length", 400
-        # cursor.execute("")
-        # cnx.commit()
-        return "Success", 200
+            return "Username/password invalid length", 400
+        cursor.execute("SELECT * FROM users WHERE username='{0}' AND password='{1}'".format(username, password))
+        for (username, password, firstName, lastName, email, birthDate) in cursor:
+            d = {'username': username, 'password': password, 'firstName': firstName, 'lastName':lastName, 'email':email, 'birthDate':birthDate}
+        return d, 200
 
 
 @app.route('/event/add', methods=['POST'])
 def addEvent():
     if request.method == 'POST':
-        username, checkPassword, name, expectedTime, startDateTime, repeat, numTimesMissed = request.form['username'],request.form['password'],request.form['name'], request.form['expectedTime'], \
-                                                                    request.form['startDateTime'], request.form[
-                                                                        'repeat'], \
-                                                                    request.form['numTimesMissed']
-
+        username, checkPassword, name, expectedTime, startDateTime, repeat, numTimesMissed = request.form['username'], \
+                                                                                             request.form['password'], \
+                                                                                             request.form['name'], \
+                                                                                             request.form[
+                                                                                                 'expectedTime'], \
+                                                                                             request.form[
+                                                                                                 'startDateTime'], \
+                                                                                             request.form['repeat'], \
+                                                                                             request.form[
+                                                                                                 'numTimesMissed']
+        print(username)
         regex_startDateTime = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
         if not 0 < len(name) < 20:
             return "Name invalid length", 400
         elif not re.search(regex_startDateTime, startDateTime):
-            return "Record not found", 400
+            return "startDateTime invalid format", 400
         elif not repeat in ('daily', 'weekly', 'monthly', 'none'):
-            return "Record not found", 400
+            return "repeat invalid format", 400
         cursor.execute(
             "SELECT * FROM users WHERE username='{}'".format(username))
         for (firstName, lastName, username, password, email, birthDate) in cursor:
@@ -118,8 +127,11 @@ def getEvents():
             if (password == checkPassword):
                 print("SELECT * FROM events{0}".format(username))
                 cursor.execute("SELECT * FROM events{}".format(username))
+                d = []
                 for (name, expectedTime, startDateTime, repeatTime, numTimesMissed) in cursor:
-                    print(name, expectedTime, startDateTime,repeatTime, numTimesMissed)
+                    (name, expectedTime, startDateTime,repeatTime, numTimesMissed)
+                    d.append({'name': name, 'expectedTime': expectedTime, 'startDateTime': str(startDateTime), 'repeat': repeatTime,
+                     'numTimesMissed': numTimesMissed})
                 # execute
-                return "sample"
+                return json.dumps(d)
         return "Invalid credentials", 400
