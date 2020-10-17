@@ -1,6 +1,7 @@
 from flask import Flask, Response
 from flask import request
 import mysql.connector
+import mysql
 import uuid
 
 cnx = mysql.connector.connect(user='root', password='dreamTeam135',
@@ -21,7 +22,6 @@ def hello_world():
 @app.route('/create', methods=['POST'])
 def create():
     if request.method == 'POST':
-        print(request.form)
         firstName = request.form['firstName']
         lastName = request.form['lastName']
         username = request.form['username']
@@ -30,7 +30,7 @@ def create():
         birthDate = request.form['birthDate']
         max = 50
         #regex_email = '[^@]+@[^@]+\.[^@]+'
-        
+
         if len(firstName) > max and len(lastName) > max and len(username) > max and len(password) > max and len(
                 birthDate) > max:
             return "Record not found", 400
@@ -39,8 +39,19 @@ def create():
 
         data = [firstName, lastName, username, password, email, birthDate]
         print(data)
-        #Create a way to generate unique id everytime
-        cursor.execute("INSERT INTO users (firstName, lastName ,username, password, email, birthDate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}')".format(
+        try:
+            cursor.execute("INSERT INTO users (firstName, lastName ,username, password, email, birthDate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}')".format(
             data[0], data[1], data[2], data[3], data[4], data[5]))
+        except mysql.connector.Error:
+            return ("User with username already exists",400)
+        cnx.commit()
+
+        return "Success", 200
+
+@app.route('/delete',methods=['POST'])
+def delete():
+    if request.method == 'POST':
+        username, password = request.form['username'],request.form['password']
+        cursor.execute("DELETE FROM users WHERE username = '{0}' AND password = '{1}'".format(username, password))
         cnx.commit()
         return "Success", 200
