@@ -60,8 +60,11 @@ def delete():
 def login():
     if request.method == 'POST':
         username, password = request.form['username'], request.form['password']
-        if 20 < len(username) < 0 and 20 < len(password) < 6:
+        if 20 < len(username) < 6 and 20 < len(password) < 6:
             return "Record not found", 400
         #cursor.execute("")
         #cnx.commit()
         return "Success", 200
+
+@app.route('/event/add',methods=['POST'])
+def login():
