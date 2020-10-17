@@ -44,7 +44,7 @@ def create():
             data[0], data[1], data[2], data[3], data[4], data[5]))
         except mysql.connector.Error:
             return ("User with username already exists",400)
-        cursor.execute("CREATE TABLE events{0} (name varchar(255), expectedTime int , startDateTime DATETIME, repeat varchar(255), numTimesMissed int)".format(data[0]))
+        cursor.execute("CREATE TABLE events{0} (name varchar(255), expectedTime int , startDateTime DATETIME, repeatTime varchar(255), numTimesMissed int)".format(data[2]))
         cnx.commit()
         return "Success", 200
         
@@ -81,3 +81,5 @@ def getEvents():
                  cursor.execute("SELECT * FROM events{0}".format(username))
                  for name, expectedTime, startDateTime, repeat, numTimesMissed in cursor:
                      print(name, expectedTime, startDateTime, repeat, numTimesMissed)
+                 #execute
+                 return "sample"
