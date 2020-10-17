@@ -69,7 +69,20 @@ def login():
 @app.route('/event/add',methods=['POST'])
 def addEvent():
     if request.method == 'POST':
-       name, expectedTime, startDateTime, repeat, numTimesMissed = request.form
+        name, expectedTime, startDateTime, repeat, numTimesMissed = request.form['name'], request.form['expectedTime'], \
+                                                                   request.form['startDateTime'], request.form['repeat'], \
+                                                                   request.form['numTimesMissed']
+
+        regex_startDateTime = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
+        if not 0 < len(name) < 20:
+            return "Record not found", 400
+        elif not re.search(regex_startDateTime, startDateTime):
+            return "Record not found", 400
+        elif not repeat in ('daily', 'weekly', 'monthly', 'none'):
+            return "Record not found", 400
+
+        event_data = [name, expectedTime, startDateTime, repeat, numTimesMissed]
+        return "Success", 200
 
 @app.route('/event/get', methods=['POST'])
 def getEvents():
