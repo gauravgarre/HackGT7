@@ -28,7 +28,7 @@ def create():
         password = request.form['password']
         email = request.form['email']
         birthDate = request.form['birthDate']
-        #regex_email = '[^@]+@[^@]+\.[^@]+'
+        # regex_email = '[^@]+@[^@]+\.[^@]+'
         regex_bday = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
         if not (20 > len(firstName) > 0 and 20 > len(lastName) > 0 and 20 > len(username) > 0 and 20 > len(password) > 6):
             return "Record not found", 400
@@ -41,20 +41,24 @@ def create():
         print(data)
         try:
             cursor.execute("INSERT INTO users (firstName, lastName ,username, password, email, birthDate) VALUES ('{0}','{1}','{2}','{3}','{4}','{5}')".format(
-            data[0], data[1], data[2], data[3], data[4], data[5]))
+                data[0], data[1], data[2], data[3], data[4], data[5]))
         except mysql.connector.Error:
-            return ("User with username already exists",400)
-        cursor.execute("CREATE TABLE events{0} (name varchar(255), expectedTime int , startDateTime DATETIME, repeatTime varchar(255), numTimesMissed int)".format(data[2]))
+            return ("User with username already exists", 400)
+        cursor.execute(
+            "CREATE TABLE events{0} (name varchar(255), expectedTime int , startDateTime DATETIME, repeatTime varchar(255), numTimesMissed int)".format(data[2]))
         cnx.commit()
         return "Success", 200
-        
-@app.route('/delete',methods=['POST'])
+
+
+@app.route('/delete', methods=['POST'])
 def delete():
     if request.method == 'POST':
-        username, password = request.form['username'],request.form['password']
-        cursor.execute("DELETE FROM users WHERE username = '{0}' AND password = '{1}'".format(username, password))
+        username, password = request.form['username'], request.form['password']
+        cursor.execute("DELETE FROM users WHERE username = '{0}' AND password = '{1}'".format(
+            username, password))
         cnx.commit()
         return "Success", 200
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -62,17 +66,18 @@ def login():
         username, password = request.form['username'], request.form['password']
         if 20 < len(username) < 6 and 20 < len(password) < 6:
             return "Record not found", 400
-        #cursor.execute("")
-        #cnx.commit()
+        # cursor.execute("")
+        # cnx.commit()
         return "Success", 200
 
-@app.route('/event/add',methods=['POST'])
+
+@app.route('/event/add', methods=['POST'])
 def addEvent():
     if request.method == 'POST':
-        name, expectedTime, startDateTime, repeat, numTimesMissed = request.form['name'], request.form['expectedTime'], \
-                                                                   request.form['startDateTime'], request.form['repeat'], \
-                                                                   request.form['numTimesMissed']
-
+        username, checkPassword, name, expectedTime, startDateTime, repeat, numTimesMissed = request.form['username'], request.form['password'], request.form['name'], request.form['expectedTime'], \
+            request.form['startDateTime'], request.form['repeat'], \
+            request.form['numTimesMissed']
+        print(username)
         regex_startDateTime = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
         if not 0 < len(name) < 20:
             return "Record not found", 400
@@ -80,19 +85,34 @@ def addEvent():
             return "Record not found", 400
         elif not repeat in ('daily', 'weekly', 'monthly', 'none'):
             return "Record not found", 400
+        cursor.execute(
+            "SELECT * FROM users WHERE username='{}'".format(username))
+        for (firstName, lastName, username, password, email, birthDate) in cursor:
+            print(password, 1, checkPassword)
+            if (password == checkPassword):
+                cursor.execute("INSERT INTO events{0} (name, expectedTime, startDateTime, repeatTime, numTimesMissed) VALUES ('{1}','{2}','{3}','{4}','{5}')".format(
+                    username, name, expectedTime, startDateTime, repeat, numTimesMissed))
+                cnx.commit()
+                return "Success", 200
+        event_data = [name, expectedTime,
+                      startDateTime, repeat, numTimesMissed]
+        return "Invalid credentials", 400
 
-        event_data = [name, expectedTime, startDateTime, repeat, numTimesMissed]
-        return "Success", 200
 
 @app.route('/event/get', methods=['POST'])
 def getEvents():
-     if request.method == 'POST':
-         username, checkPassword = request.form['username'],request.form['password']
-         cursor.execute("SELECT * FROM users WHERE username='{0}'".format(username))
-         for password in cursor:
-             if (password == password):
-                 cursor.execute("SELECT * FROM events{0}".format(username))
-                 for name, expectedTime, startDateTime, repeat, numTimesMissed in cursor:
-                     print(name, expectedTime, startDateTime, repeat, numTimesMissed)
-                 #execute
-                 return "sample"
+    if request.method == 'POST':
+        username, checkPassword = request.form['username'], request.form['password']
+        print(username)
+        cursor.execute(
+            "SELECT * FROM users WHERE username='{}'".format(username))
+        for (firstName, lastName, username, password, email, birthDate) in cursor:
+            print(password, 1, checkPassword)
+            if (password == checkPassword):
+                cursor.execute("SELECT * FROM events{0} ".format(username))
+                for name, expectedTime, startDateTime, repeat, numTimesMissed in cursor:
+                    print(name, expectedTime, startDateTime,
+                          repeat, numTimesMissed)
+                # execute
+                return "sample"
+        return "Invalid credentials", 400
