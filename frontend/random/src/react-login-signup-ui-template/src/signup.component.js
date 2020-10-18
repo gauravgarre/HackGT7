@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-var axios = require("axios");
+const axios = require('axios');
 
 
 class SignUp extends Component {
@@ -22,16 +22,15 @@ class SignUp extends Component {
     })
   }
 
-  create(){
-    axios.post('http://127.0.0.1:5000/create', {firstName:'this.state.fName',lastName:'this.state.lName', username:'this.state.uName',password:'this.state.pass',email:'this.state.email',birthDate:'this.state.bday'}).then(
-      function (response){
-          console.log(response.data)
-      }
-  ).catch((e)=>{
-      console.log(e)
-  })
+  createAxios(){
+    axios.post('http://127.0.0.1:5000/login', this.setState = {firstName:this.state.fName,lastName:this.state.lName, username:this.state.uName,password:this.state.pass,email:this.state.email,birthDate:this.state.bday}).then(
+        function (response){
+            console.log(response.data)
+        }
+    ).catch((e)=>{
+        console.log(e)
+    })
 }
-
   render() {
       return (
           <form>
@@ -61,7 +60,7 @@ class SignUp extends Component {
                   <input type="Email" name = "email" value = {this.state.email}  onChange = {this.handleChange} className="form-control" placeholder="Email" />
               </div>
 
-              <button type="submit" onClick = {this.create} className="btn btn-primary btn-block">Sign Up</button>
+              <button type="submit" onClick = {this.createAxios} className="btn btn-primary btn-block">Sign Up</button>
               <p className="forgot-password text-right">
                   Already registered <a href="http://localhost:3000/sign-in">sign in?</a>
               </p>
