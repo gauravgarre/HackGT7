@@ -16,8 +16,8 @@ export default class Login extends Component {
                   <input type="password" className="form-control" placeholder="Enter password" />
               </div>
 
-              <button type="submit" className="btn btn-primary btn-block">Submit</button>
-              
+              <button type="submit" onClick = {console.log("Hello")}className="btn btn-primary btn-block">Submit</button>
+
           </form>
       );
   }
