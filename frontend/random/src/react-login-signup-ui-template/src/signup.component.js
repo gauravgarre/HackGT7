@@ -22,15 +22,26 @@ class SignUp extends Component {
     })
   }
 
-  createAxios(){
-    axios.post('http://127.0.0.1:5000/login', this.setState = {firstName:this.state.fName,lastName:this.state.lName, username:this.state.uName,password:this.state.pass,email:this.state.email,birthDate:this.state.bday}).then(
-        function (response){
-            console.log(response.data)
-        }
-    ).catch((e)=>{
-        console.log(e)
-    })
-}
+  createAxios(event){
+        event.preventDefault();
+        fetch('http://127.0.0.1:5000/login', {
+           method: 'post',
+           headers: {'Content-Type':'application/json'},
+           body: JSON.stringify({
+              firstName:this.state.fName,
+              lastName:this.state.lName,
+               username:this.state.uName,
+               password:this.state.pass,
+               email:this.state.email,
+               birthDate:this.state.bday
+           })
+        }).then((data)=>{
+          console.log(data)
+        }).catch((e)=>{
+          console.log(e)
+        });
+    };
+
   render() {
       return (
           <form>
