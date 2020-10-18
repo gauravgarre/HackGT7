@@ -1,21 +1,37 @@
-import React, { useState } from 'react';
+import React from "react";
 
-function App(){
+class App extends React.Component{
 
-  const now = new Date().toLocaleTimeString();
-  const [time, changeTime] = useState(now);
+constructor(props){
+  super(props)
+  this.state ={
+    eventName : "",
+    eventType : "",
+    eventDate : "",
+    eventTime : ""
+  }
+  this.handleChange = this.handleChange.bind(this);
+}
 
-  function increase(){
-    const newTime = new Date().toLocaleTimeString();
-    changeTime(newTime)
+  handleChange(event){
+    const name = event.target.name;
+    this.setState({
+      [name]: event.target.value
+    })
   }
 
-  return(
+  render(){return(
     <div className = "container">
-    <h1>{time}}</h1>
-    <button onClick = {increase}>Get Time</button>
+        <h1>What event would you like to add?</h1>
+    <form>
+      <input name = "eventName" type = "name" value = {this.state.eventName} onChange = {this.handleChange} placeholder = "Name of event" />
+      <input name = "eventType" value = {this.state.eventType} onChange = {this.handleChange} placeholder = "Type" />
+      <input name = "eventDate" type = "date" value = {this.state.eventDate} onChange = {this.handleChange} placeholder = "Due date" />
+      <input name = "eventTime" type = "time" value = {this.state.eventTime} onChange = {this.handleChange} placeholder = "Estimated time" />
+      <button>Submit</button>
+    </form>
     </div>
   );
 }
-
+}
 export default App;
