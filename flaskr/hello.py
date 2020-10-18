@@ -96,7 +96,7 @@ def addEvent():
             request.form[
             'numTimesMissed']
         print(username)
-        regex_startDateTime = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
+        regex_startDateTime = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]'
         if not 0 < len(name) < 20:
             return "Name invalid length", 400
         elif not re.search(regex_startDateTime, startDateTime):
