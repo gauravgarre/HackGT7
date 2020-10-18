@@ -5,6 +5,7 @@ import mysql
 import uuid
 import re
 import json
+from flask_cors import CORS
 
 cnx = mysql.connector.connect(user='root', password='dreamTeam135',
                               host='104.198.46.183',
@@ -13,7 +14,7 @@ cnx.database = 'users'
 cursor = cnx.cursor()
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -23,12 +24,12 @@ def hello_world():
 @app.route('/create', methods=['POST'])
 def create():
     if request.method == 'POST':
-        firstName = request.form['firstName']
-        lastName = request.form['lastName']
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        birthDate = request.form['birthDate']
+        firstName = request.json['firstName']
+        lastName = request.json['lastName']
+        username = request.json['username']
+        password = request.json['password']
+        email = request.json['email']
+        birthDate = request.json['birthDate']
         # regex_email = '[^@]+@[^@]+\.[^@]+'
         regex_bday = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
         if not (20 > len(firstName) > 0 and 20 > len(lastName) > 0 and 20 > len(username) > 0 and 20 > len(
@@ -57,7 +58,7 @@ def create():
 @app.route('/delete', methods=['POST'])
 def delete():
     if request.method == 'POST':
-        username, password = request.form['username'], request.form['password']
+        username, password = request.json['username'], request.json['password']
         cursor.execute("DELETE FROM users WHERE username = '{0}' AND password = '{1}'".format(
             username, password))
         cnx.commit()
@@ -66,8 +67,10 @@ def delete():
 
 @app.route('/login', methods=['POST'])
 def login():
+    print (request.method)
     if request.method == 'POST':
-        username, password = request.form['username'], request.form['password']
+        print(request.json)
+        username, password = request.json['username'], request.json['password']
 
         if 20 < len(username) < 6 and 20 < len(password) < 6:
             return "Username/password invalid length", 400
